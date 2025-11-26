@@ -8,7 +8,7 @@ library(tidyr)
 library(dplyr)
 
 # Read the CSV file
-data <- read.csv("../CIVI 2.csv")
+data <- read.csv("../CIVI 3.csv")
 
 # Check the structure to confirm the column exists
 str(data)
