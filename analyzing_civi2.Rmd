@@ -1,0 +1,105 @@
+---
+title: "CIVI Indicators"
+output: html_document
+---
+
+```{r, message=FALSE, error=FALSE, results='asis', warning=FALSE, echo=FALSE, comment=NA}
+library(targets)
+library(RColorBrewer)
+library(dplyr)
+library(leaflet)
+library(htmltools)
+
+civi <- read.csv("../CIVI.csv") # Need to fix this
+indicators <- names(civi)[which(grepl("ind_", names(civi)))]
+indicators <- indicators[which(grepl("Score", indicators))]
+
+pal <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+map_list <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal,
+      values = 1:5,
+      title = ind,
+      opacity = 1
+    )
+})
+
+
+indicators2 <- names(civi)[which(grepl("CIVI", names(civi)))]
+
+pal2 <- colorNumeric(
+palette = rev(brewer.pal(5, "RdYlGn")),
+domain  = 1:4,
+#na.color = "#cccccc"
+)
+
+
+map_list2 <- lapply(indicators2, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal2(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal2,
+      values = 1:4,
+      title = ind,
+      opacity = 1
+    )
+})
+
+map_list <- c(map_list, map_list2)
+
+# Combine all maps into a tagList (for rendering in Shiny)
+map_tags <- tagList(map_list)
+
+# View in RStudio Viewer (if outside Shiny)
+browsable(map_tags)
+
+
+
+```
+s
