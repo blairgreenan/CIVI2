@@ -1,0 +1,237 @@
+---
+title: "CIVI and its indicators mapped"
+output: html_document
+---
+
+```{r, message=FALSE, error=FALSE, results='asis', warning=FALSE, echo=FALSE, comment=NA}
+library(targets)
+library(RColorBrewer)
+library(viridis)
+library(dplyr)
+library(leaflet)
+library(htmltools)
+
+civi <- read.csv("../CIVI.csv") # Need to fix this
+indicators <- names(civi)[which(grepl("ind_", names(civi)))]
+indicators <- indicators[which(grepl("Score", indicators))]
+
+pal <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+map_list <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal,
+      values = 1:5,
+      title = ind,
+      opacity = 1
+    )
+})
+
+
+indicators_civi <- names(civi)[which(grepl("CIVI", names(civi)))]
+
+pal_civi <- colorNumeric(
+palette = rev(brewer.pal(50, "RdYlGn")),  # red=low, green=high
+#palette = viridis(50, direction = 1),
+domain  = 1.5:3.6,
+#na.color = "#cccccc"
+)
+
+
+map_list_civi <- lapply(indicators_civi, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal_civi(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal_civi,
+      values = 1.5:3.6,
+      title = "CIVI",
+      opacity = 1
+    )
+})
+
+
+indicators_sensitivity <- names(civi)[which(grepl("sensitivity", names(civi)))]
+# there are multiple instances of the character string "sensitivity", so remove those that also have "ind_"
+indicators_sensitivity <- indicators_sensitivity[which(!grepl("ind_", indicators_sensitivity))]
+
+pal_sensitivity <- colorNumeric(
+palette = rev(brewer.pal(50, "RdYlGn")),  # red=low, green=high
+#palette = viridis(50, direction = 1),
+domain  = 1.2:4.5,
+#na.color = "#cccccc"
+)
+
+
+map_list_sensitivity <- lapply(indicators_sensitivity, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal_sensitivity(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal_sensitivity,
+      values = 1.2:4.5,
+      title = "Sensitivity Index",
+      opacity = 1
+    )
+})
+
+indicators_exposure <- names(civi)[which(grepl("exposure", names(civi)))]
+
+pal_exposure <- colorNumeric(
+palette = rev(brewer.pal(50, "RdYlGn")),  # red=low, green=high
+#palette = viridis(50, direction = 1),
+domain  = 1:4,
+#na.color = "#cccccc"
+)
+
+
+map_list_exposure <- lapply(indicators_exposure, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal_exposure(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal_exposure,
+      values = 1:4,
+      title = "Exposure Index",
+      opacity = 1
+    )
+})
+
+indicators_adaptive_capacity <- names(civi)[which(grepl("adaptive_capacity", names(civi)))]
+
+pal_adaptive_capacity <- colorNumeric(
+palette = rev(brewer.pal(50, "RdYlGn")),  # red=low, green=high
+#palette = viridis(50, direction = 1),
+domain  = 1.7:4.7,
+#na.color = "#cccccc"
+)
+
+
+map_list_adaptive_capacity <- lapply(indicators_adaptive_capacity, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      color = ~pal_adaptive_capacity(civi[[ind]]),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal = pal_adaptive_capacity,
+      values = 1.7:4.7,
+      title = "Adaptive Capacity Index",
+      opacity = 1
+    )
+})
+
+
+map_list <- c(map_list_civi,
+              map_list[1], map_list[2], map_list[3], map_list_sensitivity,
+              map_list[4], map_list[5], map_list_exposure, 
+              map_list[6], map_list[7], map_list[8], map_list_adaptive_capacity)
+
+# Combine all maps into a tagList (for rendering in Shiny)
+map_tags <- tagList(map_list)
+
+# View in RStudio Viewer (if outside Shiny)
+browsable(map_tags)
+
+
+
+```
+s

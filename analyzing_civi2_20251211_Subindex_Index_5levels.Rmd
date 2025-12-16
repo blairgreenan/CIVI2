@@ -1,0 +1,281 @@
+---
+title: "CIVI & Sub-Index Maps"
+output: html_document
+---
+
+```{r, message=FALSE, error=FALSE, results='asis', warning=FALSE, echo=FALSE, comment=NA}
+library(targets)
+library(RColorBrewer)
+library(dplyr)
+library(leaflet)
+library(htmltools)
+
+civi <- read.csv("../CIVI.csv") # Need to fix this
+
+
+# --- Build bins from quantiles and label them ---
+civi_vals <- civi[["CIVI"]]
+qs <- quantile(civi_vals, probs = c(0, 1/5, 2/5, 3/5, 4/5, 1), na.rm = TRUE)
+
+# Create an ordered factor: Low (green), Medium (yellow), High (red)
+civi$CIVI_cat <- cut(
+  civi_vals,
+  breaks = qs,
+  include.lowest = TRUE,
+  labels = c(1,2,3,4,5),
+  ordered_result = TRUE
+)
+
+# Ensure no leading/trailing whitespace and set as ordered factor
+civi$CIVI_cat <- trimws(civi$CIVI_cat)
+civi$CIVI_cat <- factor(
+  as.character(civi$CIVI_cat),
+  levels  = c(1,2,3,4,5),
+  ordered = TRUE
+)
+
+
+
+
+pal_civi <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+indicators <- names(civi)[which(grepl("CIVI_cat", names(civi)))]
+
+
+map_list1 <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      fillColor = ~pal_civi(CIVI_cat),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal    = pal_civi,
+      values = ~CIVI_cat,   # force legend order
+      title  = "CIVI",
+      opacity = 1
+    )
+})
+
+
+# --- Build bins from quantiles and label them ---
+civi_vals <- civi[["sensitivity"]]
+qs <- quantile(civi_vals, probs = c(0, 1/5, 2/5, 3/5, 4/5, 1), na.rm = TRUE)
+
+# Create an ordered factor: Low (green), Medium (yellow), High (red)
+civi$sensitivity_cat <- cut(
+  civi_vals,
+  breaks = qs,
+  include.lowest = TRUE,
+  labels = c(1,2,3,4,5),
+  ordered_result = TRUE
+)
+
+# Ensure no leading/trailing whitespace and set as ordered factor
+civi$sensitivity_cat <- trimws(civi$sensitivity_cat)
+civi$sensitivity_cat <- factor(
+  as.character(civi$sensitivity_cat),
+  levels  = c(1,2,3,4,5),
+  ordered = TRUE
+)
+
+
+# Re-create the palette NOW, using those levels
+pal_civi <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+indicators <- names(civi)[which(grepl("sensitivity_cat", names(civi)))]
+
+
+map_list2 <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      fillColor = ~pal_civi(sensitivity_cat),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal    = pal_civi,
+      values = ~sensitivity_cat,   # force legend order
+      title  = "Sensitivity",
+      opacity = 1
+    )
+})
+
+
+# --- Build bins from quantiles and label them ---
+civi_vals <- civi[["exposure"]]
+qs <- quantile(civi_vals, probs = c(0, 1/5, 2/5, 3/5, 4/5, 1), na.rm = TRUE)
+
+# Create an ordered factor: Low (green), Medium (yellow), High (red)
+civi$exposure_cat <- cut(
+  civi_vals,
+  breaks = qs,
+  include.lowest = TRUE,
+  labels = c(1,2,3,4,5),
+  ordered_result = TRUE
+)
+
+# Ensure no leading/trailing whitespace and set as ordered factor
+civi$exposure_cat <- trimws(civi$exposure_cat)
+civi$exposure_cat <- factor(
+  as.character(civi$exposure_cat),
+  levels  = c(1,2,3,4,5),
+  ordered = TRUE
+)
+
+
+# Re-create the palette NOW, using those levels
+pal_civi <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+indicators <- names(civi)[which(grepl("exposure_cat", names(civi)))]
+
+
+map_list3 <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      fillColor = ~pal_civi(exposure_cat),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal    = pal_civi,
+      values = ~exposure_cat,   # force legend order
+      title  = "Exposure",
+      opacity = 1
+    )
+})
+
+
+# --- Build bins from quantiles and label them ---
+civi_vals <- civi[["adaptive_capacity"]]
+qs <- quantile(civi_vals, probs = c(0, 1/5, 2/5, 3/5, 4/5, 1), na.rm = TRUE)
+
+# Create an ordered factor: Low (green), Medium (yellow), High (red)
+civi$adaptive_capacity_cat <- cut(
+  civi_vals,
+  breaks = qs,
+  include.lowest = TRUE,
+  labels = c(1,2,3,4,5),
+  ordered_result = TRUE
+)
+
+# Ensure no leading/trailing whitespace and set as ordered factor
+civi$adaptive_capacity_cat <- trimws(civi$adaptive_capacity_cat)
+civi$adaptive_capacity_cat <- factor(
+  as.character(civi$adaptive_capacity_cat),
+  levels  = c(1,2,3,4,5),
+  ordered = TRUE
+)
+
+
+# Re-create the palette NOW, using those levels
+pal_civi <- colorFactor(
+  palette = rev(brewer.pal(5, "RdYlGn")),  # red=low, green=high
+  domain = 1:5
+)
+
+indicators <- names(civi)[which(grepl("adaptive_capacity_cat", names(civi)))]
+
+
+map_list4 <- lapply(indicators, function(ind) {
+  leaflet(civi) %>%
+    addTiles() %>%
+    addCircleMarkers(
+      lng = ~Long,
+      lat = ~Lat,
+      fillColor = ~pal_civi(adaptive_capacity_cat),
+      radius = 6,
+      stroke = FALSE,
+      fillOpacity = 0.9,
+      
+      
+      label = ~paste(
+        "Harbour:", HarbourCode, "<br>",
+        "NAME:", HarbourName, "<br>",
+        ind, "score:", civi[[ind]]
+      ) %>% lapply(htmltools::HTML)
+      
+      
+      
+      #label = ~paste(ind, "score:", civi[[ind]])
+    ) %>%
+    addLegend(
+      "bottomright",
+      pal    = pal_civi,
+      values = ~adaptive_capacity_cat,   # force legend order
+      title  = "Adaptive Capacity",
+      opacity = 1
+    )
+})
+
+
+
+map_list <- c(map_list1, map_list2, map_list3, map_list4)
+
+# Combine all maps into a tagList (for rendering in Shiny)
+map_tags <- tagList(map_list)
+
+# View in RStudio Viewer (if outside Shiny)
+browsable(map_tags)
+
+
+
+```
+s
